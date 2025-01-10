@@ -1,14 +1,12 @@
 import torch
 import torch.nn as nn
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw
 from skimage.morphology import square, dilation, erosion
-from utils import pose_transform
-# import pose_transform
+from utils import pose_transform  # Ensure this is accessible
 import json
-from PIL import ImageDraw
 from torchvision import utils, transforms
-from skimage.draw import circle, line_aa, polygon
+from skimage.draw import disk, line_aa, polygon
 
 np.seterr(divide='ignore', invalid='ignore')
 
@@ -109,10 +107,10 @@ def draw_pose_from_cords(pose_joints, img_size, radius=6, draw_joints=True):
     for i, joint in enumerate(pose_joints):
         if pose_joints[i][0] == MISSING_VALUE or pose_joints[i][1] == MISSING_VALUE:
             continue
-        yy, xx = circle(joint[0], joint[1], radius=radius, shape=img_size)
+        # 使用 disk 替代 circle
+        yy, xx = disk((joint[0], joint[1]), radius=radius, shape=img_size)
         colors[yy, xx] = COLORS[i]
         mask[yy, xx] = True
-
     return colors, mask
 
 def decode_labels(mask, num_images=1, num_classes=20):
